@@ -1,0 +1,11 @@
+services:
+  imageproxy:
+    image: imageproxy
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4593:4593"
+      - "3080:80"
+    volumes:
+      - ./data:/var/cache/imageproxy

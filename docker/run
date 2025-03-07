@@ -1,0 +1,34 @@
+#!/bin/bash
+
+echo Getting env.config
+CONFIG=$(cat env.config)
+
+SERVICE=imageproxy
+
+trap 'echo signal received!; kill "${child_pid}"; wait "${child_pid}"' SIGINT SIGTERM
+
+if [ -z "${ENV}" ]; then
+  echo Using Local Config
+else
+  echo Decrypting config files
+  gpg --batch --passphrase $ENC_KEY --decrypt deployment-configs.tar.gz.gpg | tar -xzv
+
+  echo Getting $ENV config
+  CONFIG=$(cat deployment-configs/$(echo $ENV | tr '[:upper:]' '[:lower:]').config)
+  
+  if [ -z "$CONFIG" ]
+  then
+    echo Could not get $ENV config
+    echo "Using local configuration"
+  else
+    eval $(echo $CONFIG | sed 's/^/export /')
+    echo Got $ENV config
+    echo $CONFIG >> /etc/environment
+  fi
+
+fi
+
+/usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf -n &
+child_pid=$!
+
+wait "$child_pid"

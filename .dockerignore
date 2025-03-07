@@ -1,0 +1,9 @@
+.git
+.env
+.dockerignore
+.env.docker
+.env.example
+.editorconfig
+Dockerfile
+*.dockerfile
+.jenkins
