@@ -1,6 +1,7 @@
 services:
   imageproxy:
     image: imageproxy
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
